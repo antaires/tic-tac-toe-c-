@@ -1,6 +1,8 @@
 #include <iostream>
 #include "./Constants.h"
 #include "./Game.h"
+#include "./Board.h"
+#include "./Graphics.h"
 
 
 int main(int argc, char* args[]){

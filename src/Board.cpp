@@ -1,9 +1,6 @@
 #include "./Board.h"
 
-char board[ROW][COLUMN];
-unsigned int gameState;
-unsigned int moveCount;
-char winner;
+unsigned int Board::gameState;
 
 Board::Board(){
   for (int i = 0; i < ROW; ++i){
@@ -20,7 +17,6 @@ Board::~Board(){}
 
 bool Board::Update(char piece, unsigned int row, unsigned int column){
   if (row > (ROW - 1) || column > (COLUMN - 1)){
-    std::cout<<"\nBoard array out of bounds cannot update";
     return false;
   }
   if (this->board[row][column] == 'E'){
@@ -41,9 +37,9 @@ void Board::SetGameState(){
     }
   }
 
-  if (winner != 'E' && (board[0][0] == board[1][1] && board[1][1] == board[2][2]
-      || board[0][2] == board[1][1] && board[1][1] == board[2][0])){
-    winner = board[0][0];
+  if (winner == 'E' && ((board[0][0] == board[1][1] && board[1][1] == board[2][2])
+      || (board[0][2] == board[1][1] && board[1][1] == board[2][0]))){
+    winner = board[1][1];
   }
 
   switch(winner){
@@ -61,6 +57,10 @@ void Board::SetGameState(){
     gameState = DRAW;
     return;
   }
+}
+
+unsigned int Board::GetGameState(){
+  return gameState;
 }
 
 char Board::GetCell(unsigned int row,unsigned int column){
