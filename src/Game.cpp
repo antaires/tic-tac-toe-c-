@@ -1,12 +1,12 @@
 #include <iostream>
 #include "./Constants.h"
 #include "./Game.h"
+// #include "../lib/glm/glm.hpp" todo needed? if not, remove library
 
 SDL_Renderer* Game::renderer;
 SDL_Event Game::event;
 
 Game::Game() {
-  board = new Board();
   this->isRunning = false;
 }
 
@@ -48,8 +48,7 @@ void Game::Initialize(int width, int height){
 }
 
 void Game::LoadLevel(int levelNumber){
-  // TODO Initialize board
-
+  board = new Board();
 }
 
 void Game::ProcessInput(){
@@ -83,7 +82,6 @@ void Game::Update(){
   // sets the new ticks for the current frame to be used in the next pass
   ticksLastFrame = SDL_GetTicks();
 
-  // use delta time to update my game objects
   board->Update(deltaTime);
 
 }
@@ -97,10 +95,62 @@ void Game::Render(){
   if (board->GameOver()){
     return;
   }
-  board->Render();
+
+  Game::RenderBoard();
 
   // swap buffers and render
   SDL_RenderPresent(renderer);
+}
+
+void Game::RenderBoard(){
+  // todo
+  // draw each cell to screen
+  // use texture Managager
+  // to start, just draw diff colored rectangles (black = E, red = X, blue = 0)
+  char cell;
+  int x = 0;
+  int y = 0;
+  int h = WINDOW_HEIGHT / 3; // todo int/float any issues for diff sizes?
+  int w = WINDOW_WIDTH / 3;
+
+  unsigned int r;
+  unsigned int g;
+  unsigned int b;
+
+  for (int i = 0; i < ROW; ++i){
+    for(int j = 0; j < COLUMN; ++j){
+      cell = board->GetCell(i, j);
+      SDL_Rect rect;
+      rect.x = x;
+      rect.y = y;
+      rect.w = w;
+      rect.h = h;
+
+      switch(cell){
+        case 'X':
+          r = 52;
+          g = 235;
+          b = 219;
+          break;
+        case 'O':
+          r = 235;
+          g = 171;
+          b = 52;
+          break;
+        default:
+          r = 84;
+          g = 84;
+          b = 84;
+      }
+
+      SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+      SDL_RenderFillRect(renderer, &rect);
+
+      // increment positions x y
+      x += w;
+      y += h;
+    }
+  }
 }
 
 void Game::Destroy(){

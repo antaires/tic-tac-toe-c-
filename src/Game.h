@@ -10,6 +10,7 @@ class Game {
   private:
     bool isRunning;
     SDL_Window *window;
+    void RenderBoard();
   public:
     Game();
     ~Game();
