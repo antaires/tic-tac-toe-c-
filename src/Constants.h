@@ -15,11 +15,9 @@ const unsigned int HUMAN = 0;
 const unsigned int PC = 1;
 
 // board state
-const unsigned int START = 0;
-const unsigned int HUMAN_TURN = 1;
-const unsigned int PC_TURN = 2;
-const unsigned int HUMAN_WIN = 3;
-const unsigned int PC_WIN = 4;
-const unsigned int DRAW = 5;
+const unsigned int PLAYING = 0;
+const unsigned int X_WIN = 1;
+const unsigned int O_WIN = 2;
+const unsigned int DRAW = 3;
 
 #endif

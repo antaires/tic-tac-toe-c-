@@ -71,12 +71,10 @@ void Game::ProcessInput(){
         isRunning = false;
       }
     }
-
     case SDL_MOUSEMOTION: {
       // todo if mouse hovering over square, reduce its alpha
       break;
     }
-
     case SDL_MOUSEBUTTONDOWN: {
       if (currentPlayer == HUMAN){
         int x, y;
@@ -86,7 +84,6 @@ void Game::ProcessInput(){
         row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
       }
     }
-
     default: {
       break;
     }
@@ -102,9 +99,11 @@ void Game::ProcessAI(){
 }
 
 void Game::Update(){
+  // make move
   if (board->Update(currentMove, row, column)){
     Game::TogglePlayer();
   }
+
 }
 
 void Game::Render(){
@@ -114,6 +113,17 @@ void Game::Render(){
   SDL_RenderClear(renderer);
 
   if (board->GameOver()){
+    // todo place in graphics
+    if (board->GameOver()){
+      if (board->XWin()){
+        std::cout<<"\nX wins!";
+      } else if (board->OWin()){
+        std::cout<<"\nO wins!";
+      } else {
+        std::cout<<"\nits a draw :/";
+      }
+    }
+    this->isRunning = false;
     return;
   }
 
@@ -186,4 +196,5 @@ void Game::Destroy(){
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();
+  board->Destroy();
 }
