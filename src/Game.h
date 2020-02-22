@@ -12,13 +12,13 @@ class Game {
   private:
     bool isRunning;
     SDL_Window *window;
-    char currentPlayer;
-    char currentMove;
-    int row;
-    int column;
+    unsigned int currentPlayer;
+    unsigned int currentMove;
+    unsigned int row;
+    unsigned int column;
     void RenderBoard();
     void RenderCell(char cell, int x, int y, int w, int h);
-    char Toggle(char currentPlayer);
+    void TogglePlayer();
   public:
     Game();
     ~Game();

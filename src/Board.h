@@ -12,9 +12,9 @@ public:
   Board();
   ~Board();
   bool GameOver();
-  bool Update(char piece, int row, int column);
-  char GetCell(int row, int column);
-  void GetEmptyCell(int& row, int& column);
+  bool Update(char piece, unsigned int row, unsigned int column);
+  char GetCell(unsigned int row, unsigned int column);
+  void GetEmptyCell(unsigned int& row, unsigned int& column);
   void Destroy();
 };
 

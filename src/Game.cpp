@@ -7,10 +7,10 @@ SDL_Renderer* Game::renderer;
 SDL_Event Game::event;
 
 // track move
-int currentPlayer;
-char currentMove;
-int row;
-int column;
+unsigned int currentPlayer;
+unsigned char currentMove;
+unsigned int row;
+unsigned int column;
 
 // todo temporary AI
 int rand(void);
@@ -103,7 +103,7 @@ void Game::ProcessAI(){
 
 void Game::Update(){
   if (board->Update(currentMove, row, column)){
-    currentPlayer = Game::Toggle(currentPlayer);
+    Game::TogglePlayer();
   }
 }
 
@@ -125,10 +125,10 @@ void Game::Render(){
 
 void Game::RenderBoard(){
   char cell;
-  int x = 0;
-  int y = 0;
-  int h = WINDOW_HEIGHT / ROW;
-  int w = WINDOW_WIDTH / COLUMN;
+  unsigned int x = 0;
+  unsigned int y = 0;
+  unsigned int h = WINDOW_HEIGHT / ROW;
+  unsigned int w = WINDOW_WIDTH / COLUMN;
   for (int i = 0; i < ROW; ++i){
     x = 0;
     for(int j = 0; j < COLUMN; ++j){
@@ -172,13 +172,14 @@ void Game::RenderCell(char cell, int x, int y, int w, int h){
   SDL_RenderFillRect(renderer, &rect);
 }
 
-char Game::Toggle(char currentPlayer){
+void Game::TogglePlayer(){
   if (currentPlayer == HUMAN){
     currentPlayer = PC;
     currentMove = 'O';
+  } else {
+    currentPlayer = HUMAN;
+    currentMove = 'X';
   }
-  currentPlayer = HUMAN;
-  currentMove = 'X';
 }
 
 void Game::Destroy(){

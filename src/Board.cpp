@@ -17,7 +17,11 @@ bool Board::GameOver(){
   return false;
 }
 
-bool Board::Update(char piece, int row, int column){
+bool Board::Update(char piece, unsigned int row, unsigned int column){
+  if (row > (ROW - 1) || column > (COLUMN - 1)){
+    std::cout<<"\nBoard array out of bounds cannot update";
+    return false;
+  }
   if (this->board[row][column] == 'E'){
     this->board[row][column] = piece;
     return true;
@@ -25,11 +29,11 @@ bool Board::Update(char piece, int row, int column){
   return false;
 }
 
-char Board::GetCell(int row, int column){
+char Board::GetCell(unsigned int row,unsigned int column){
   return this->board[row][column];
 }
 
-void Board::GetEmptyCell(int& row, int& column){
+void Board::GetEmptyCell(unsigned int& row, unsigned int& column){
   for (int i = 0; i < ROW; ++i){
     for(int j = 0; j < COLUMN; ++j){
       if (this->board[i][j] == 'E'){
