@@ -5,12 +5,20 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include "./Board.h"
+#include <cmath>
+#include <cstdlib>
 
 class Game {
   private:
     bool isRunning;
     SDL_Window *window;
+    char currentPlayer;
+    char currentMove;
+    int row;
+    int column;
     void RenderBoard();
+    void RenderCell(char cell, int x, int y, int w, int h);
+    char Toggle(char currentPlayer);
   public:
     Game();
     ~Game();
@@ -19,9 +27,10 @@ class Game {
     static SDL_Renderer *renderer;
     Board *board;
     static SDL_Event event;
-    void LoadLevel(int levelNumber);
+    void Start();
     void Initialize(int width, int height);
     void ProcessInput();
+    void ProcessAI();
     void Update();
     void Render();
     void Destroy();

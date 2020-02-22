@@ -12,6 +12,7 @@ int main(int argc, char* args[]){
   // GAME LOOP
   while(game->IsRunning()){
     game->ProcessInput();
+    game->ProcessAI();
     game->Update();
     game->Render();
   }

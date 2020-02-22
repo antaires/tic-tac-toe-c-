@@ -12,9 +12,9 @@ public:
   Board();
   ~Board();
   bool GameOver();
-  bool MakeMove();
-  bool Update(float deltaTime);
+  bool Update(char piece, int row, int column);
   char GetCell(int row, int column);
+  void GetEmptyCell(int& row, int& column);
   void Destroy();
 };
 

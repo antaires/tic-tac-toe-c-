@@ -6,6 +6,15 @@
 SDL_Renderer* Game::renderer;
 SDL_Event Game::event;
 
+// track move
+int currentPlayer;
+char currentMove;
+int row;
+int column;
+
+// todo temporary AI
+int rand(void);
+
 Game::Game() {
   this->isRunning = false;
 }
@@ -17,7 +26,6 @@ bool Game::IsRunning() const {
 }
 
 void Game::Initialize(int width, int height){
-  // create all SDL inits / flow
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
     std::cerr<< "Error Initializing SDL" << std::endl;
     return;
@@ -34,21 +42,21 @@ void Game::Initialize(int width, int height){
     std::cerr<<"Error Creating SDL Window" << std::endl;
     return;
   }
-
   renderer = SDL_CreateRenderer(window, -1 , 0);
   if (!renderer){
     std::cerr<<"Error Creating SDL Renderer" << std::endl;
     return;
   }
-
-  LoadLevel(0);
-
+  Start();
   isRunning = true;
   return;
 }
 
-void Game::LoadLevel(int levelNumber){
-  board = new Board();
+void Game::Start(){
+  this->board = new Board();
+  // todo later, choose who starts (x always 1st)
+  this->currentPlayer = HUMAN;
+  this->currentMove = 'X';
 }
 
 void Game::ProcessInput(){
@@ -63,27 +71,40 @@ void Game::ProcessInput(){
         isRunning = false;
       }
     }
+
+    case SDL_MOUSEMOTION: {
+      // todo if mouse hovering over square, reduce its alpha
+      break;
+    }
+
+    case SDL_MOUSEBUTTONDOWN: {
+      if (currentPlayer == HUMAN){
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        // get index of clicked cell
+        column = std::floor(x / (WINDOW_WIDTH / ROW));
+        row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
+      }
+    }
+
     default: {
       break;
     }
   }
+
+}
+
+void Game::ProcessAI(){
+  // todo update AI
+  if (currentPlayer == PC){
+    board->GetEmptyCell(row, column);
+  }
 }
 
 void Game::Update(){
-  // wait until FRAME_TARGET_TIME reached since last frame
-  while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME));
-
-  // delta time is difference in ticks from last frame converted to seconds
-  float deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
-
-  // clamp to max value - set max deltaTime, in case of debugging or delay
-  deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
-
-  // sets the new ticks for the current frame to be used in the next pass
-  ticksLastFrame = SDL_GetTicks();
-
-  board->Update(deltaTime);
-
+  if (board->Update(currentMove, row, column)){
+    currentPlayer = Game::Toggle(currentPlayer);
+  }
 }
 
 void Game::Render(){
@@ -103,54 +124,61 @@ void Game::Render(){
 }
 
 void Game::RenderBoard(){
-  // todo
-  // draw each cell to screen
-  // use texture Managager
-  // to start, just draw diff colored rectangles (black = E, red = X, blue = 0)
   char cell;
   int x = 0;
   int y = 0;
-  int h = WINDOW_HEIGHT / 3; // todo int/float any issues for diff sizes?
-  int w = WINDOW_WIDTH / 3;
+  int h = WINDOW_HEIGHT / ROW;
+  int w = WINDOW_WIDTH / COLUMN;
+  for (int i = 0; i < ROW; ++i){
+    x = 0;
+    for(int j = 0; j < COLUMN; ++j){
+      cell = board->GetCell(i, j);
+      Game::RenderCell(cell, x, y, w, h);
+      x += w;
+    }
+    y += h;
+  }
+}
 
+void Game::RenderCell(char cell, int x, int y, int w, int h){
   unsigned int r;
   unsigned int g;
   unsigned int b;
 
-  for (int i = 0; i < ROW; ++i){
-    for(int j = 0; j < COLUMN; ++j){
-      cell = board->GetCell(i, j);
-      SDL_Rect rect;
-      rect.x = x;
-      rect.y = y;
-      rect.w = w;
-      rect.h = h;
+  SDL_Rect rect;
+  rect.x = x;
+  rect.y = y;
+  rect.w = w;
+  rect.h = h;
 
-      switch(cell){
-        case 'X':
-          r = 52;
-          g = 235;
-          b = 219;
-          break;
-        case 'O':
-          r = 235;
-          g = 171;
-          b = 52;
-          break;
-        default:
-          r = 84;
-          g = 84;
-          b = 84;
-      }
-
-      SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-      SDL_RenderFillRect(renderer, &rect);
-
-      // increment positions x y
-      x += w;
-      y += h;
-    }
+  switch(cell){
+    case 'X':
+      r = 52;
+      g = 235;
+      b = 219;
+      break;
+    case 'O':
+      r = 235;
+      g = 171;
+      b = 52;
+      break;
+    default:
+      r = 84;
+      g = 84;
+      b = 84;
   }
+
+  SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+  SDL_RenderFillRect(renderer, &rect);
+}
+
+char Game::Toggle(char currentPlayer){
+  if (currentPlayer == HUMAN){
+    currentPlayer = PC;
+    currentMove = 'O';
+  }
+  currentPlayer = HUMAN;
+  currentMove = 'X';
 }
 
 void Game::Destroy(){
