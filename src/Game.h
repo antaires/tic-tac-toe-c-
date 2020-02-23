@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "./Graphics.h"
+#include "./Minimax.h"
 
 class Game {
   private:
@@ -15,9 +16,11 @@ class Game {
   public:
     Game();
     ~Game();
+    unsigned int gameState;
     bool IsRunning() const;
-    static Board *board;
+    Board *board;
     Graphics* graphics;
+    Minimax* minimax;
 
     void Start();
     void Initialize(int width, int height);
@@ -26,6 +29,7 @@ class Game {
     void Update();
     void Render();
     void Destroy();
+    unsigned int GetGameState();
 };
 
 #endif

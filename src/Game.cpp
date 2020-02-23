@@ -1,9 +1,6 @@
-#include <iostream>
-#include "./Constants.h"
 #include "./Game.h"
-// #include "../lib/glm/glm.hpp" todo needed? if not, remove library
 
-Board* Game::board;
+// #include "../lib/glm/glm.hpp" todo needed(textures)? if not, remove library
 
 Game::Game() {
   this->isRunning = false;
@@ -18,6 +15,7 @@ bool Game::IsRunning() const {
 void Game::Initialize(int width, int height){
   this->board = new Board();
   this->graphics = new Graphics();
+  this->minimax = new Minimax();
   graphics->Initialize(width, height);
   Start();
   isRunning = true;
@@ -31,35 +29,35 @@ void Game::Start(){
   this->row = ROW;
   this->column = COLUMN;
   board->SetUpBoard();
+  gameState = START;
 }
 
 void Game::ProcessInput(){
-  if (!graphics->ProcessInput(board, currentPlayer, isRunning, row, column)){
+  if (!graphics->ProcessInput(board, gameState, currentPlayer, isRunning, row, column)){
     isRunning = false;
   }
-
-  if (board->GetGameState() == RESET){
+  if (board->GetBoardState() == RESET){
     Game::Start();
   }
 }
 
 void Game::ProcessAI(){
-  // todo update AI
-  if (currentPlayer == PC){
+  if (currentPlayer == PC && gameState == PLAYING){
+    // minimax->GetBestMove(board, row, column);
     board->GetEmptyCell(row, column);
   }
 }
 
 void Game::Update(){
-  // make move
+  // set move on board
   if (board->Update(currentMove, row, column)){
     Game::TogglePlayer();
   }
-
+  gameState = board->GetBoardState();
 }
 
 void Game::Render(){
-  graphics->Render(board);
+  graphics->Render(board, gameState);
 }
 
 void Game::TogglePlayer(){
@@ -70,6 +68,10 @@ void Game::TogglePlayer(){
     currentPlayer = HUMAN;
     currentMove = 'X';
   }
+}
+
+unsigned int Game::GetGameState(){
+  return board->GetBoardState();
 }
 
 void Game::Destroy(){

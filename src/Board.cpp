@@ -1,7 +1,5 @@
 #include "./Board.h"
 
-unsigned int Board::gameState;
-
 Board::Board(){
   Board::SetUpBoard();
 }
@@ -15,13 +13,13 @@ bool Board::Update(char piece, unsigned int row, unsigned int column){
   if (this->board[row][column] == 'E'){
     this->board[row][column] = piece;
     moveCount++;
-    this->SetGameState();
+    this->SetBoardState();
     return true;
   }
   return false;
 }
 
-void Board::SetGameState(){
+void Board::SetBoardState(){
   for(int i = 0; i < ROW; ++i){
     if (board[i][0] == board[i][1] && board[i][1] == board[i][2]){
       winner = board[i][0];
@@ -37,27 +35,31 @@ void Board::SetGameState(){
 
   switch(winner){
     case 'X':
-      gameState = X_WIN;
+      boardState = X_WIN;
       break;
     case 'O':
-      gameState = O_WIN;
+      boardState = O_WIN;
       break;
     default:
-      gameState = PLAYING;
+      boardState = PLAYING;
   }
 
-  if (gameState == PLAYING && moveCount == ROW * COLUMN){
-    gameState = DRAW;
+  if (boardState == PLAYING && moveCount == ROW * COLUMN){
+    boardState = DRAW;
     return;
   }
 }
 
-unsigned int Board::GetGameState(){
-  return gameState;
+unsigned int Board::GetBoardState(){
+  return boardState;
 }
 
 char Board::GetCell(unsigned int row,unsigned int column){
   return this->board[row][column];
+}
+
+void Board::SetEmpty(unsigned int row, unsigned int column){
+  this->board[row][column] = 'E';
 }
 
 void Board::GetEmptyCell(unsigned int& row, unsigned int& column){
@@ -72,18 +74,18 @@ void Board::GetEmptyCell(unsigned int& row, unsigned int& column){
 }
 
 bool Board::GameOver(){
-  if (gameState == X_WIN || gameState == O_WIN || gameState == DRAW){
+  if (boardState == X_WIN || boardState == O_WIN || boardState == DRAW){
     return true;
   }
   return false;
 }
 
 void Board::Playing(){
-  gameState = PLAYING;
+  boardState = PLAYING;
 }
 
 void Board::Reset(){
-  gameState = RESET;
+  boardState = RESET;
 }
 
 void Board::SetUpBoard(){
@@ -94,7 +96,7 @@ void Board::SetUpBoard(){
   }
   moveCount = 0;
   winner = 'E';
-  gameState = START;
+  boardState = START;
 }
 
 void Board::Print(){

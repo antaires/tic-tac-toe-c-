@@ -7,13 +7,19 @@
 #include "./Board.h"
 #include <cmath>
 #include <cstdlib>
+#include <string>
 
 class Graphics {
   private:
+    TTF_Font* font;
     void RenderStartScreen();
     void RenderBoard(Board* board);
     void RenderCell(char cell, int x, int y, int w, int h);
-    void RenderEndScreen(std::string outcome);
+    void RenderEndScreen(Board* board, unsigned int gameState);
+    void RenderText(const char* text, int x, int y);
+    void RenderLines();
+    void RenderLine(int x, int y, int w, int h);
+    TTF_Font* LoadFont();
   public:
     Graphics();
     ~Graphics();
@@ -22,9 +28,9 @@ class Graphics {
     SDL_Window *window;
 
     void Initialize(int width, int height);
-    bool ProcessInput(Board* board, unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column);
+    bool ProcessInput(Board* board, unsigned int gameState, unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column);
     void Update();
-    void Render(Board* board);
+    void Render(Board* board, unsigned int gameState);
     void Destroy();
 };
 
