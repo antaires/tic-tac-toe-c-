@@ -6,8 +6,6 @@ SDL_Window* window;
 
 Graphics::Graphics(){}
 
-Graphics::~Graphics(){}
-
 void Graphics::Initialize(int width, int height){
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
     std::cerr<< "Error Initializing SDL" << std::endl;
@@ -39,7 +37,7 @@ void Graphics::Initialize(int width, int height){
   font = LoadFont();
 }
 
-bool Graphics::ProcessInput(Board* board, unsigned int gameState, unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column){
+bool Graphics::ProcessInput(Board* board, unsigned int gameState, unsigned int currentPlayer, bool isRunning, unsigned int& index){
   SDL_PollEvent(&event);
   switch(event.type){
     case SDL_QUIT: { // clicking 'x button' on window
@@ -65,18 +63,15 @@ bool Graphics::ProcessInput(Board* board, unsigned int gameState, unsigned int c
       }
 
     }
-    case SDL_MOUSEMOTION: {
-      // todo if mouse hovering over square, reduce its alpha
-      break;
-    }
     case SDL_MOUSEBUTTONDOWN: {
         if (gameState == PLAYING){
           if (currentPlayer == HUMAN){
             int x, y;
             SDL_GetMouseState(&x, &y);
             // get index of clicked cell
-            column = std::floor(x / (WINDOW_WIDTH / ROW));
-            row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
+            int column = std::floor(x / (WINDOW_WIDTH / ROW));
+            int row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
+            index = Graphics::GetIndex(row, column);
           }
       }
       break;
@@ -88,7 +83,7 @@ bool Graphics::ProcessInput(Board* board, unsigned int gameState, unsigned int c
   return true;
 }
 
-void Graphics::Render(Board* board, unsigned int gameState){
+void Graphics::Render(Board* board, unsigned int gameState) const {
   SDL_SetRenderDrawColor(renderer, 65, 112, 100, 255);
   // clear back buffer
   SDL_RenderClear(renderer);
@@ -113,7 +108,7 @@ void Graphics::Render(Board* board, unsigned int gameState){
   SDL_RenderPresent(renderer);
 }
 
-void Graphics::RenderStartScreen(){
+void Graphics::RenderStartScreen() const {
   SDL_Rect rect;
   rect.x = 0;
   rect.y = 0;
@@ -121,12 +116,12 @@ void Graphics::RenderStartScreen(){
   rect.h = WINDOW_HEIGHT;
   SDL_SetRenderDrawColor(renderer, 65, 112, 100, 255);
   SDL_RenderFillRect(renderer, &rect);
-  Graphics::RenderText(std::string("Tic").c_str(), WINDOW_WIDTH / 3, 0);
-  Graphics::RenderText(std::string("Tac").c_str(), WINDOW_WIDTH / 3, WINDOW_HEIGHT / 3);
-  Graphics::RenderText(std::string("Toe").c_str(), WINDOW_WIDTH / 3, (WINDOW_HEIGHT / 3) *2);
+  Graphics::RenderText(std::string("Tic").c_str(), WINDOW_WIDTH / 5, 0);
+  Graphics::RenderText(std::string("Tac").c_str(), WINDOW_WIDTH / 5, WINDOW_HEIGHT / 3);
+  Graphics::RenderText(std::string("Toe").c_str(), WINDOW_WIDTH / 5, (WINDOW_HEIGHT / 3) *2);
 }
 
-void Graphics::RenderBoard(Board* board){
+void Graphics::RenderBoard(Board* board) const {
   char cell;
   unsigned int x = 0;
   unsigned int y = 0;
@@ -135,7 +130,8 @@ void Graphics::RenderBoard(Board* board){
   for (int i = 0; i < ROW; ++i){
     x = 0;
     for(int j = 0; j < COLUMN; ++j){
-      cell = board->GetCell(i, j);
+      unsigned int index = Graphics::GetIndex(i, j);
+      cell = board->GetCell(index);
       Graphics::RenderCell(cell, x, y, w, h);
       x += w;
     }
@@ -144,7 +140,7 @@ void Graphics::RenderBoard(Board* board){
   Graphics::RenderLines();
 }
 
-void Graphics::RenderCell(char cell, int x, int y, int w, int h){
+void Graphics::RenderCell(char cell, int x, int y, int w, int h) const {
   unsigned int r;
   unsigned int g;
   unsigned int b;
@@ -181,14 +177,14 @@ void Graphics::RenderCell(char cell, int x, int y, int w, int h){
   Graphics::RenderText(text.c_str(), (x + X_OFFSET), (y + Y_OFFSET));
 }
 
-void Graphics::RenderLines(){
+void Graphics::RenderLines() const {
   Graphics::RenderLine(WINDOW_WIDTH / 3, 0, 10, WINDOW_HEIGHT);
   Graphics::RenderLine((WINDOW_WIDTH / 3 )* 2, 0, 10, WINDOW_HEIGHT);
   Graphics::RenderLine(0, WINDOW_HEIGHT /3, WINDOW_WIDTH, 10);
   Graphics::RenderLine(0, (WINDOW_HEIGHT / 3 )* 2, WINDOW_WIDTH, 10);
 }
 
-void Graphics::RenderLine(int x, int y, int w, int h){
+void Graphics::RenderLine(int x, int y, int w, int h) const {
   SDL_Rect rect;
   rect.x = x;
   rect.y = y;
@@ -198,7 +194,7 @@ void Graphics::RenderLine(int x, int y, int w, int h){
   SDL_RenderFillRect(renderer, &rect);
 }
 
-void Graphics::RenderText(const char* text, int x, int y){
+void Graphics::RenderText(const char* text, int x, int y) const {
   if (!text || !font){
     std::cerr<<"\nCannot render text";
     return;
@@ -220,7 +216,6 @@ void Graphics::RenderText(const char* text, int x, int y){
   SDL_DestroyTexture(Message);
 }
 
-
 TTF_Font* Graphics::LoadFont(){
   TTF_Font* f = TTF_OpenFont(std::string("./assets/fonts/arial.ttf").c_str(), 100);
   if (!f){
@@ -230,7 +225,7 @@ TTF_Font* Graphics::LoadFont(){
   return f;
 }
 
-void Graphics::RenderEndScreen(Board* board, unsigned int gameState){
+void Graphics::RenderEndScreen(Board* board, unsigned int gameState) const {
   SDL_Rect rect;
   rect.x = 0;
   rect.y = 0;
@@ -241,17 +236,32 @@ void Graphics::RenderEndScreen(Board* board, unsigned int gameState){
 
   switch(gameState){
     case X_WIN:
-      Graphics::RenderText(std::string(" X").c_str(), WINDOW_WIDTH / 3, 0);
-      Graphics::RenderText(std::string("Wins").c_str(), WINDOW_WIDTH / 3, WINDOW_HEIGHT / 3);
+      Graphics::RenderText(std::string("X").c_str(), WINDOW_WIDTH / 3, 0);
+      Graphics::RenderText(std::string("Wins").c_str(), WINDOW_WIDTH / 6, WINDOW_HEIGHT / 3);
       break;
     case O_WIN:
-    Graphics::RenderText(std::string(" O").c_str(), WINDOW_WIDTH / 3, 0);
-    Graphics::RenderText(std::string("Wins").c_str(), WINDOW_WIDTH / 3, WINDOW_HEIGHT / 3);
+    Graphics::RenderText(std::string("O").c_str(), WINDOW_WIDTH / 3, 0);
+    Graphics::RenderText(std::string("Wins").c_str(), WINDOW_WIDTH / 7, WINDOW_HEIGHT / 3);
       break;
     default:
-    Graphics::RenderText(std::string("Draw").c_str(), WINDOW_WIDTH / 4, WINDOW_HEIGHT / 3);
+    Graphics::RenderText(std::string("Draw").c_str(), WINDOW_WIDTH / 7, WINDOW_HEIGHT / 3);
       break;
   }
+}
+
+unsigned int Graphics::GetIndex(unsigned int i, unsigned int j) const {
+    if (i > ROW || j > COLUMN){
+      return (ROW * COLUMN);
+    }
+    if (i == 0 && j == 0){ return 0;}
+    if (i == 0 && j == 1){ return 1;}
+    if (i == 0 && j == 2){ return 2;}
+    if (i == 1 && j == 0){ return 3;}
+    if (i == 1 && j == 1){ return 4;}
+    if (i == 1 && j == 2){ return 5;}
+    if (i == 2 && j == 0){ return 6;}
+    if (i == 2 && j == 1){ return 7;}
+    if (i == 2 && j == 2){ return 8;}
 }
 
 void Graphics::Destroy(){

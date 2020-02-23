@@ -1,12 +1,8 @@
 #include "./Game.h"
 
-// #include "../lib/glm/glm.hpp" todo needed(textures)? if not, remove library
-
 Game::Game() {
   this->isRunning = false;
 }
-
-Game::~Game() {}
 
 bool Game::IsRunning() const {
   return this->isRunning;
@@ -23,17 +19,15 @@ void Game::Initialize(int width, int height){
 }
 
 void Game::Start(){
-  // todo later, choose who starts (x always 1st)
   this->currentPlayer = HUMAN;
   this->currentMove = 'X';
-  this->row = ROW;
-  this->column = COLUMN;
-  board->SetUpBoard();
+  this->index = (ROW * COLUMN);
   gameState = START;
+  board->Initialize();
 }
 
 void Game::ProcessInput(){
-  if (!graphics->ProcessInput(board, gameState, currentPlayer, isRunning, row, column)){
+  if (!graphics->ProcessInput(board, gameState, currentPlayer, isRunning, index)){
     isRunning = false;
   }
   if (board->GetBoardState() == RESET){
@@ -43,14 +37,13 @@ void Game::ProcessInput(){
 
 void Game::ProcessAI(){
   if (currentPlayer == PC && gameState == PLAYING){
-    // minimax->GetBestMove(board, row, column);
-    board->GetEmptyCell(row, column);
+    minimax->GetBestMove(board, index);
   }
 }
 
 void Game::Update(){
   // set move on board
-  if (board->Update(currentMove, row, column)){
+  if (board->Update(currentMove, index)){
     Game::TogglePlayer();
   }
   gameState = board->GetBoardState();
@@ -74,6 +67,19 @@ unsigned int Game::GetGameState(){
   return board->GetBoardState();
 }
 
+unsigned int Game::GetCurrentPlayer(){
+  return this->currentPlayer;
+}
+unsigned int Game::GetCurrentMove(){
+  return this->currentMove;
+}
+unsigned int Game::GetIndex(){
+  return this->index;
+}
+
 void Game::Destroy(){
   graphics->Destroy();
+  delete board;
+  delete graphics;
+  delete minimax;
 }

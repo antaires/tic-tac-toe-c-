@@ -5,14 +5,14 @@
 
 class Minimax {
   private:
-    int Evaluate(Board* board, int depth);
-    int MinimaxCalc(Board* cloneBoard, int depth, bool isMaximizingPlayer);
+    int currentMove;
+    void Evaluate(Board* board, int depth);
+    void MinimaxCalc(Board* cloneBoard, int depth, bool isMaximizingPlayer, int& value);
     void Clone(Board* original, Board* clone);
 
   public:
     Minimax();
-    void GetBestMove(Board* board, unsigned int& row, unsigned int& column);
-
+    void GetBestMove(Board* board, unsigned int& index);
 };
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <assert.h>
+
 // window
 const unsigned int WINDOW_WIDTH = 300;
 const unsigned int WINDOW_HEIGHT = 300;
@@ -28,5 +30,8 @@ const int WINPOINTS = 10;
 const int LOSEPOINTS = -10;
 const char MAXIMIZER = 'X';
 const char MINIMIZER = 'O';
+
+// testing
+const bool TEST = true;
 
 #endif

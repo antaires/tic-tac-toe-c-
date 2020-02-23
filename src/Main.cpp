@@ -2,12 +2,16 @@
 #include "./Constants.h"
 #include "./Game.h"
 #include "./Board.h"
-#include "./Graphics.h"
-
+#include "./Test.h"
 
 int main(int argc, char* args[]){
 
-  // game class responsible for game loop and rendering etc
+  if (TEST){
+    Test *test = new Test();
+    test->RunTests();
+    delete test;
+  } 
+
   Game *game = new Game();
   game->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -20,6 +24,7 @@ int main(int argc, char* args[]){
   }
 
   game->Destroy();
+  delete game;
 
   return 0;
 }

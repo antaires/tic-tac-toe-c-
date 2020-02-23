@@ -6,26 +6,24 @@
 
 class Board {
 private:
-  char board[ROW][COLUMN];
+  char board[ROW * COLUMN];
   unsigned int moveCount;
-  void SetBoardState();
   char winner;
+  void UpdateBoardState();
+  void Test();
+  void TestInit();
 
 public:
   Board();
-  ~Board();
   unsigned int boardState;
-  bool GameOver();
-  unsigned int GetBoardState();
+  void Initialize();
+  bool Update(char piece, unsigned int index);
   void Playing();
-  bool Update(char piece, unsigned int row, unsigned int column);
-  char GetCell(unsigned int row, unsigned int column);
-  void GetEmptyCell(unsigned int& row, unsigned int& column);
-  void SetEmpty(unsigned int row, unsigned int column);
+  bool GameOver();
+  void SetEmpty(unsigned int index);
+  unsigned int GetBoardState() const;
+  char GetCell(unsigned int index) const;
   void Reset();
-  void SetUpBoard();
-  void Destroy();
-  void Print();
 };
 
 #endif

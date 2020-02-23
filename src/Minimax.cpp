@@ -1,74 +1,60 @@
 #include "./Minimax.h"
 
 /* Takes in a board object and return the best move for the PC
-  player using the minimax algorithm. A variation is unsigned
-  to preference moves that lead to quick wins or slow losses */
+  player using the minimax algorithm. This variation
+  preferences moves that lead to quick wins or slow losses */
 
 Minimax::Minimax(){}
 
-void Minimax::GetBestMove(Board* board, unsigned int& row, unsigned int& column){
+void Minimax::GetBestMove(Board* board, unsigned int& index){
   // works through each move and scores based on HUMAN or PC winner or DRAW
-  unsigned int bestMoveRow = 0;
-  unsigned int bestMoveCol = 0;
-  int currentMove = 0;
-  int bestMoveValue = -1;
+  unsigned int bestMove = 0;
+  int bestMoveValue = 10000;
   bool isMaximizingPlayer = false; // always false in this implementation
   Board* cloneBoard = new Board();
   Minimax::Clone(board, cloneBoard);
-  // if board empty, pick random start (PC always goes 2nd, so can skip)
-  
-  // get each empty square
-  for(int i = 0; i < ROW; ++i){
-    for(int j = 0; j < COLUMN; ++j){
-      if (cloneBoard->GetCell(i, j) == 'E'){
-        cloneBoard->Update('O', i, j); // need to update this to always be PC if player can choose X or O
-        currentMove = Minimax::MinimaxCalc(cloneBoard, 0, true); // PC always minimizing (todo should this be false)
-        // undo move
-        cloneBoard->SetEmpty(i, j);
+  currentMove = -1;
 
-        // if maximizer (skip - PC always minimizing)
-        if (isMaximizingPlayer){
-          if (currentMove > bestMoveValue){
-            bestMoveValue = currentMove;
-            bestMoveRow = i;
-            bestMoveCol = j;
-          }
-        } else {
-          // if MINIMIZER
-          if (currentMove < bestMoveValue){
-            bestMoveValue = currentMove;
-            bestMoveRow = i;
-            bestMoveCol = j;
-          }
-        }
+  // get each empty square
+  for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    if (cloneBoard->GetCell(i) == 'E'){
+
+      cloneBoard->Update('O', i);
+      Minimax::MinimaxCalc(cloneBoard, 0, true, currentMove);
+      // undo move
+      cloneBoard->SetEmpty(i);
+      // if MINIMIZER
+      if (currentMove < bestMoveValue){
+        bestMoveValue = currentMove;
+        bestMove = i;
       }
     }
   }
-  // set best move
-  row = bestMoveRow;
-  column = bestMoveCol;
+  index = bestMove;
+  delete cloneBoard;
 }
 
-int Minimax::Evaluate(Board* cloneBoard, int depth){
+void Minimax::Evaluate(Board* cloneBoard, int depth){
   // determines point value of initial move based on game outcome
   // depth is number of moves made prior to game end state
   switch (cloneBoard->GetBoardState()){
     case X_WIN:
       // winner is maximizer (HUMAN)
-      return (WINPOINTS - depth);
+      this->currentMove = (WINPOINTS - depth);
     case O_WIN:
       // winner is minimizer (PC)
-      return (LOSEPOINTS + depth);
+      this->currentMove = (LOSEPOINTS + depth);
     default:
-      return 0;
+      this->currentMove = 0;
   }
 }
 
-int Minimax::MinimaxCalc(Board* cloneBoard, int depth, bool isMaximizingPlayer){
+void Minimax::MinimaxCalc(Board* cloneBoard, int depth, bool isMaximizingPlayer, int& returnValue){
   // Minimax: https://en.wikipedia.org/wiki/Minimax
   unsigned int state = cloneBoard->GetBoardState();
   if (state == X_WIN || state == O_WIN || state == DRAW){
-    return Minimax::Evaluate(cloneBoard, depth);
+    Minimax::Evaluate(cloneBoard, depth);
+    return;
   }
 
   int bestValue;
@@ -78,38 +64,41 @@ int Minimax::MinimaxCalc(Board* cloneBoard, int depth, bool isMaximizingPlayer){
   if (isMaximizingPlayer){
     // maximizer
     bestValue = -10000;
-    for(int i = 0; i < ROW; ++i){
-      for(int j = 0; j < COLUMN; ++j){
-        if (clone->GetCell(i, j) == 'E'){
-          clone->Update('X', i, j);
-          int value = Minimax::MinimaxCalc(clone, depth+1, false);
-          bestValue = bestValue > value ? bestValue : value;
-          clone->SetEmpty(i, j);
-        }
+    for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+      if (clone->GetCell(i) == 'E'){
+        clone->Playing();
+        clone->Update('X', i);
+        int value;
+        Minimax::MinimaxCalc(clone, depth+1, false, value);
+        bestValue = bestValue > value ? bestValue : value;
+        clone->SetEmpty(i);
       }
     }
-    return bestValue;
+    delete clone;
+    returnValue = bestValue;
+    return;
   } else {
     // minimizer
     int bestValue = 10000;
-    for(int i = 0; i < ROW; ++i){
-      for(int j = 0; j < COLUMN; ++j){
-        if (clone->GetCell(i, j) == 'E'){
-          clone->Update('O', i, j);
-          int value = Minimax::MinimaxCalc(clone, depth+1, true);
-          bestValue = bestValue < value ? bestValue : value;
-          clone->SetEmpty(i, j);
-        }
+    for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+      if (clone->GetCell(i) == 'E'){
+        clone->Update('O', i);
+        int value;
+        Minimax::MinimaxCalc(clone, depth+1, true, value);
+        bestValue = bestValue < value ? bestValue : value;
+        clone->SetEmpty(i);
       }
     }
   }
-  return bestValue;
+  delete clone;
+  returnValue = bestValue;
+  return;
 }
 
 void Minimax::Clone(Board* original, Board* clone){
-  for(int i = 0; i < ROW; ++i){
-    for(int j = 0; j < COLUMN; ++j){
-      clone->Update(original->GetCell(i, j), i, j);
-    }
+  clone->Initialize();
+  clone->Playing();
+  for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    clone->Update(original->GetCell(i), i);
   }
 }

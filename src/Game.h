@@ -9,19 +9,15 @@ class Game {
     bool isRunning;
     unsigned int currentPlayer;
     unsigned int currentMove;
-    unsigned int row;
-    unsigned int column;
+    unsigned int index;
     void TogglePlayer();
 
   public:
     Game();
-    ~Game();
     unsigned int gameState;
-    bool IsRunning() const;
     Board *board;
     Graphics* graphics;
     Minimax* minimax;
-
     void Start();
     void Initialize(int width, int height);
     void ProcessInput();
@@ -29,7 +25,11 @@ class Game {
     void Update();
     void Render();
     void Destroy();
+    bool IsRunning() const;
     unsigned int GetGameState();
+    unsigned int GetCurrentPlayer();
+    unsigned int GetCurrentMove();
+    unsigned int GetIndex();
 };
 
 #endif
