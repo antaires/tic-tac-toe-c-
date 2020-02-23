@@ -17,12 +17,13 @@ public:
   ~Board();
   static unsigned int gameState;
   bool GameOver();
-  bool XWin();
-  bool OWin();
   unsigned int GetGameState();
+  void Playing();
   bool Update(char piece, unsigned int row, unsigned int column);
   char GetCell(unsigned int row, unsigned int column);
   void GetEmptyCell(unsigned int& row, unsigned int& column);
+  void Reset();
+  void SetUpBoard();
   void Destroy();
 };
 

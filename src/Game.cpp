@@ -16,6 +16,7 @@ bool Game::IsRunning() const {
 }
 
 void Game::Initialize(int width, int height){
+  this->board = new Board();
   this->graphics = new Graphics();
   graphics->Initialize(width, height);
   Start();
@@ -24,17 +25,21 @@ void Game::Initialize(int width, int height){
 }
 
 void Game::Start(){
-  this->board = new Board();
   // todo later, choose who starts (x always 1st)
   this->currentPlayer = HUMAN;
   this->currentMove = 'X';
   this->row = ROW;
   this->column = COLUMN;
+  board->SetUpBoard();
 }
 
 void Game::ProcessInput(){
-  if (!graphics->ProcessInput(currentPlayer, isRunning, row, column)){
+  if (!graphics->ProcessInput(board, currentPlayer, isRunning, row, column)){
     isRunning = false;
+  }
+
+  if (board->GetGameState() == RESET){
+    Game::Start();
   }
 }
 
@@ -50,14 +55,11 @@ void Game::Update(){
   if (board->Update(currentMove, row, column)){
     Game::TogglePlayer();
   }
+
 }
 
 void Game::Render(){
   graphics->Render(board);
-  if (graphics->Quit()){
-    this->isRunning = false;
-    return;
-  }
 }
 
 void Game::TogglePlayer(){

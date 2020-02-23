@@ -10,7 +10,6 @@
 
 class Graphics {
   private:
-    bool quit;
     void RenderStartScreen();
     void RenderBoard(Board* board);
     void RenderCell(char cell, int x, int y, int w, int h);
@@ -23,10 +22,9 @@ class Graphics {
     SDL_Window *window;
 
     void Initialize(int width, int height);
-    bool ProcessInput(unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column);
+    bool ProcessInput(Board* board, unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column);
     void Update();
     void Render(Board* board);
-    bool Quit();
     void Destroy();
 };
 

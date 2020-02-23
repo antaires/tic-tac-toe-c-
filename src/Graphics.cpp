@@ -4,9 +4,8 @@ SDL_Renderer* Graphics::renderer;
 SDL_Event Graphics::event;
 SDL_Window* window;
 
-Graphics::Graphics(){
-  quit = false;
-}
+Graphics::Graphics(){}
+
 Graphics::~Graphics(){}
 
 void Graphics::Initialize(int width, int height){
@@ -33,7 +32,7 @@ void Graphics::Initialize(int width, int height){
   }
 }
 
-bool Graphics::ProcessInput(unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column){
+bool Graphics::ProcessInput(Board* board, unsigned int currentPlayer, bool isRunning, unsigned int& row, unsigned int& column){
   SDL_PollEvent(&event);
   switch(event.type){
     case SDL_QUIT: { // clicking 'x button' on window
@@ -43,18 +42,35 @@ bool Graphics::ProcessInput(unsigned int currentPlayer, bool isRunning, unsigned
       if (event.key.keysym.sym == SDLK_ESCAPE){
         return false;
       }
+
+      // control game state from user input
+      if (event.key.keysym.sym == SDLK_RETURN){
+        switch(board->GetGameState()){
+          case START:
+            board->Playing();
+            break;
+          case PLAYING:
+            break;
+          default:
+            board->Reset();
+            break;
+        }
+      }
+
     }
     case SDL_MOUSEMOTION: {
       // todo if mouse hovering over square, reduce its alpha
       break;
     }
     case SDL_MOUSEBUTTONDOWN: {
-      if (currentPlayer == HUMAN){
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        // get index of clicked cell
-        column = std::floor(x / (WINDOW_WIDTH / ROW));
-        row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
+        if (board->gameState == PLAYING){
+          if (currentPlayer == HUMAN){
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            // get index of clicked cell
+            column = std::floor(x / (WINDOW_WIDTH / ROW));
+            row = std::floor(y / (WINDOW_HEIGHT / COLUMN));
+          }
       }
       break;
     }
@@ -73,13 +89,20 @@ void Graphics::Render(Board* board){
   // todo switch(gameState) to draw different screens!
   switch(board->GetGameState()){
     case START:
+      Graphics::RenderStartScreen();
       break;
     case PLAYING:
       Graphics::RenderBoard(board);
       break;
     case X_WIN: // todo create render funcs for different screens, with buttons
+      Graphics::RenderEndScreen("X");
+      break;
     case O_WIN:
+      Graphics::RenderEndScreen("O");
+      break;
     case DRAW:
+      Graphics::RenderEndScreen("E");
+      break;
     default:
       break;
   }
@@ -90,6 +113,13 @@ void Graphics::Render(Board* board){
 
 void Graphics::RenderStartScreen(){
   // todo load fonts
+  SDL_Rect rect;
+  rect.x = 0;
+  rect.y = 0;
+  rect.w = WINDOW_WIDTH;
+  rect.h = WINDOW_HEIGHT;
+  SDL_SetRenderDrawColor(renderer, 50, 168,82, 255);
+  SDL_RenderFillRect(renderer, &rect);
 }
 
 void Graphics::RenderBoard(Board* board){
@@ -143,14 +173,14 @@ void Graphics::RenderCell(char cell, int x, int y, int w, int h){
 
 void Graphics::RenderEndScreen(std::string outcome){
   // todo
-}
-
-bool Graphics::Quit(){
-  // todo using this? better to add deltaTime and timeout on start & end screens
-  if (quit){
-    return true;
-  }
-  return false;
+  // todo load fonts
+  SDL_Rect rect;
+  rect.x = 0;
+  rect.y = 0;
+  rect.w = WINDOW_WIDTH;
+  rect.h = WINDOW_HEIGHT;
+  SDL_SetRenderDrawColor(renderer, 158, 16,82, 255);
+  SDL_RenderFillRect(renderer, &rect);
 }
 
 void Graphics::Destroy(){

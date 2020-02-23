@@ -3,14 +3,7 @@
 unsigned int Board::gameState;
 
 Board::Board(){
-  for (int i = 0; i < ROW; ++i){
-    for(int j = 0; j < COLUMN; ++j){
-      this->board[i][j] = 'E';
-    }
-  }
-  gameState = PLAYING;
-  moveCount = 0;
-  winner = 'E';
+  Board::SetUpBoard();
 }
 
 Board::~Board(){}
@@ -85,18 +78,23 @@ bool Board::GameOver(){
   return false;
 }
 
-bool Board::XWin(){
-  if (gameState == X_WIN){
-    return true;
-  }
-  return false;
+void Board::Playing(){
+  gameState = PLAYING;
 }
 
-bool Board::OWin(){
-  if (gameState == O_WIN){
-    return true;
+void Board::Reset(){
+  gameState = RESET;
+}
+
+void Board::SetUpBoard(){
+  for (int i = 0; i < ROW; ++i){
+    for(int j = 0; j < COLUMN; ++j){
+      this->board[i][j] = 'E';
+    }
   }
-  return false;
+  moveCount = 0;
+  winner = 'E';
+  gameState = START;
 }
 
 void Board::Print(){
