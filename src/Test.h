@@ -12,6 +12,7 @@ class Test {
 private:
   void TestBoard();
   void TestGame();
+  void TestMinimax();
 public:
   Test();
   void RunTests();

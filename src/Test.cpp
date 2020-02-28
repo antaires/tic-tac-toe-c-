@@ -5,7 +5,7 @@ Test::Test(){}
 void Test::RunTests(){
   Test::TestBoard();
   Test::TestGame();
-
+  Test::TestMinimax();
 }
 
 void Test::TestBoard(){
@@ -73,7 +73,7 @@ void Test::TestBoard(){
 
     // test set empty
     assert(b->GetCell(1) == 'X');
-    b->SetEmpty(1);
+    b->UndoMove(1);
     assert(b->GetCell(1) == 'E');
 
     delete b;
@@ -91,4 +91,32 @@ void Test::TestGame(){
   assert(g->GetGameState() == START);
 
   delete g;
+}
+
+void Test::TestMinimax(){
+  Minimax* m = new Minimax();
+  Board* b = new Board();
+  b->Initialize();
+  b->Playing();
+  unsigned int index = 0;
+
+  // test Clone
+  Board* clone = new Board();
+  char cells0[(ROW * COLUMN)] = {'X', 'X', 'E', 'O', 'E', 'X', 'E', 'E', 'E'};
+  b->SetAll(cells0);
+  m->Clone(b, clone);
+  for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    assert(clone->GetCell(i) == b->GetCell(i));
+  }
+
+  // test scenario (6 is a win for O)
+  char cells1[(ROW * COLUMN)] = {'O', 'X', 'E', 'O', 'E', 'X', 'E', 'E', 'E'};
+  b->Playing();
+  b->SetAll(cells1);
+  b->Update('X', 8);
+  m->GetBestMove(b, index);
+  assert(index == 6);
+
+  delete b;
+  delete m;
 }

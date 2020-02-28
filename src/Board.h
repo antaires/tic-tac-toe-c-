@@ -10,8 +10,7 @@ private:
   unsigned int moveCount;
   char winner;
   void UpdateBoardState();
-  void Test();
-  void TestInit();
+  bool IsFull();
 
 public:
   Board();
@@ -20,10 +19,12 @@ public:
   bool Update(char piece, unsigned int index);
   void Playing();
   bool GameOver();
-  void SetEmpty(unsigned int index);
+  void UndoMove(unsigned int index);
   unsigned int GetBoardState() const;
-  char GetCell(unsigned int index) const;
+  char GetCell(unsigned int index);
   void Reset();
+  bool SetAll(char cells[]);
+  void Print();
 };
 
 #endif

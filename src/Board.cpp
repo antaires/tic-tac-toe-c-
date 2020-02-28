@@ -6,7 +6,6 @@ void Board::Initialize(){
   for (unsigned int i = 0; i < (ROW * COLUMN); ++i){
     this->board[i] = 'E';
   }
-  moveCount = 0;
   winner = 'E';
   boardState = START;
 }
@@ -17,7 +16,6 @@ bool Board::Update(char piece, unsigned int index){
   }
   if (this->board[index] == 'E'){
     this->board[index] = piece;
-    moveCount++;
     this->UpdateBoardState();
     return true;
   }
@@ -58,22 +56,40 @@ void Board::UpdateBoardState(){
       boardState = PLAYING;
   }
 
-  if (boardState == PLAYING && moveCount == (ROW * COLUMN) ){
+  if (boardState == PLAYING && Board::IsFull()){
     boardState = DRAW;
     return;
   }
+}
+
+bool Board::IsFull(){
+  for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    if (board[i] == 'E'){
+      return false;
+    }
+  }
+  return true;
 }
 
 unsigned int Board::GetBoardState() const {
   return boardState;
 }
 
-char Board::GetCell(unsigned int index) const{
+char Board::GetCell(unsigned int index) {
   return this->board[index];
 }
 
-void Board::SetEmpty(unsigned int index){
+void Board::UndoMove(unsigned int index){
   this->board[index] = 'E';
+}
+
+bool Board::SetAll(char cells[]){
+  // function for testing states
+  if (cells == NULL){return false;}
+  for(unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    board[i] = cells[i];
+  }
+  return true;
 }
 
 bool Board::GameOver(){
@@ -89,4 +105,16 @@ void Board::Playing(){
 
 void Board::Reset(){
   boardState = RESET;
+}
+
+
+void Board::Print(){
+  std::cout<<"\n";
+  for (unsigned int i = 0; i < (ROW * COLUMN); ++i){
+    std::cout<<this->board[i];
+    if(i == 2 || i == 5){
+      std::cout<<"\n";
+    }
+  }
+  std::cout<<"\n";
 }

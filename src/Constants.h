@@ -32,6 +32,6 @@ const char MAXIMIZER = 'X';
 const char MINIMIZER = 'O';
 
 // testing
-const bool TEST = true;
+const bool TEST = false;
 
 #endif
