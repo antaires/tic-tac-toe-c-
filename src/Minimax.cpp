@@ -16,12 +16,15 @@ void Minimax::GetBestMove(Board* board, unsigned int& index){
     if (clone->GetCell(i) == 'E'){
       clone->Playing();
       clone->Update('O', i);
-      int temp = MaxSearch(clone);
+      Board* tempClone = new Board();
+      Minimax::Clone(clone, tempClone);
+      int temp = MaxSearch(tempClone);
       if (temp < score){
         score = temp;
         move = i;
       }
       clone->UndoMove(i);
+      delete tempClone;
     }
   }
   index = move;
